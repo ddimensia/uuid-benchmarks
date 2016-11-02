@@ -10,13 +10,13 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.Throughput)
 @OutputTimeUnit(TimeUnit.SECONDS)
-@Warmup(iterations = 16,
+@Warmup(iterations = 4,
         time = 2500,
         timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 16,
+@Measurement(iterations = 4,
         time = 2500,
         timeUnit = TimeUnit.MILLISECONDS)
-@Fork(1)
+@Threads(Threads.MAX)
 @State(Scope.Benchmark)
 public class UUIDBenchmark {
     private TimeBasedGenerator timeBasedGenerator;
@@ -27,12 +27,30 @@ public class UUIDBenchmark {
     }
 
     @Benchmark
+    @Fork(value = 1,
+            jvmArgs = {"-XX:+UnlockCommercialFeatures",
+                    "-XX:+FlightRecorder",
+                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/random_uuid.jfr"})
     public UUID testSecureRandomUUID() {
         return UUID.randomUUID();
     }
 
     @Benchmark
+    @Fork(value = 1,
+            jvmArgs = {"-XX:+UnlockCommercialFeatures",
+                    "-XX:+FlightRecorder",
+                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/eth_uuid.jfr"})
     public UUID testJUGUUID() {
         return this.timeBasedGenerator.generate();
+    }
+
+    @Benchmark
+    @Fork(value = 1,
+            jvmArgs = {"-Djava.security.egd=file:/dev/./urandom",
+                    "-XX:+UnlockCommercialFeatures",
+                    "-XX:+FlightRecorder",
+                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/thread_uuid.jfr"})
+    public UUID testThreadLocalSecureUUID() {
+        return ThreadLocalUUIDGenerator.generateUUID();
     }
 }
