@@ -27,29 +27,20 @@ public class UUIDBenchmark {
     }
 
     @Benchmark
-    @Fork(value = 1,
-            jvmArgs = {"-XX:+UnlockCommercialFeatures",
-                    "-XX:+FlightRecorder",
-                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/random_uuid.jfr"})
+    @Fork(1)
     public UUID testSecureRandomUUID() {
         return UUID.randomUUID();
     }
 
     @Benchmark
-    @Fork(value = 1,
-            jvmArgs = {"-XX:+UnlockCommercialFeatures",
-                    "-XX:+FlightRecorder",
-                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/eth_uuid.jfr"})
+    @Fork(1)
     public UUID testJUGUUID() {
         return this.timeBasedGenerator.generate();
     }
 
     @Benchmark
     @Fork(value = 1,
-            jvmArgs = {"-Djava.security.egd=file:/dev/./urandom",
-                    "-XX:+UnlockCommercialFeatures",
-                    "-XX:+FlightRecorder",
-                    "-XX:FlightRecorderOptions=defaultrecording=true,dumponexit=true,dumponexitpath=/tmp/thread_uuid.jfr"})
+            jvmArgs = {"-Djava.security.egd=file:/dev/./urandom"})
     public UUID testThreadLocalSecureUUID() {
         return ThreadLocalUUIDGenerator.generateUUID();
     }
